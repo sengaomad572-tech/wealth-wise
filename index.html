@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alpha System v4.0</title>
+    <style>
+        body {
+            background-color: #000;
+            color: #0f0;
+            font-family: 'Courier New', monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .terminal-container {
+            width: 90%;
+            max-width: 400px;
+            border: 2px solid #0f0;
+            padding: 20px;
+            background: rgba(0, 20, 0, 0.9);
+            box-shadow: 0 0 20px #0f0;
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #0f0;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            background: transparent;
+            border: 1px solid #0f0;
+            color: #0f0;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #0f0;
+            color: #000;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 10px;
+            text-transform: uppercase;
+        }
+
+        button:hover {
+            background: #000;
+            color: #0f0;
+            border: 1px solid #0f0;
+        }
+
+        #status {
+            margin-top: 15px;
+            font-size: 0.8rem;
+            text-align: center;
+            height: 20px;
+        }
+
+        .hidden { display: none; }
+        
+        .link {
+            text-align: center;
+            font-size: 0.7rem;
+            margin-top: 15px;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<div class="terminal-container">
+    <div id="login-box">
+        <div class="header">> ALPHA_CORE_LOGIN</div>
+        <input type="text" id="user" placeholder="USERNAME">
+        <input type="password" id="pass" placeholder="PASSWORD">
+        <button onclick="auth()">[ AUTHORIZE ]</button>
+        <div class="link" onclick="toggle()">Need an account? REGISTER</div>
+    </div>
+
+    <div id="reg-box" class="hidden">
+        <div class="header">> SIGN_UP_SYSTEM</div>
+        <input type="text" id="re-user" placeholder="NEW USERNAME">
+        <input type="email" id="re-email" placeholder="EMAIL">
+        <input type="password" id="re-pass" placeholder="NEW PASSWORD">
+        <button onclick="reg()">[ CREATE_ACCOUNT ]</button>
+        <div class="link" onclick="toggle()">Already have an account? LOGIN</div>
+    </div>
+
+    <div id="status"></div>
+</div>
+
+<script>
+    const status = document.getElementById('status');
+
+    function toggle() {
+        document.getElementById('login-box').classList.toggle('hidden');
+        document.getElementById('reg-box').classList.toggle('hidden');
+        status.innerText = "";
+    }
+
+    function auth() {
+        const u = document.getElementById('user').value;
+        const p = document.getElementById('pass').value;
+
+        if (u === "" || p === "") {
+            status.style.color = "red";
+            status.innerText = "> ACCESS_DENIED: EMPTY_FIELDS";
+        } else {
+            status.style.color = "#0f0";
+            status.innerText = "> ACCESS_GRANTED. REDIRECTING...";
+            
+            // 2 soniyadan keyin boshqa saytga o'tkazish
+            setTimeout(() => {
+                window.location.href = "https://google.com"; // BU YERGA O'ZINGIZNING ASOSIY SAHIFANGIZNI LINKINI QO'YING
+            }, 2000);
+        }
+    }
+
+    function reg() {
+        const u = document.getElementById('re-user').value;
+        const e = document.getElementById('re-email').value;
+        const p = document.getElementById('re-pass').value;
+
+        if (!u || !e || !p) {
+            status.style.color = "red";
+            status.innerText = "> ERROR: DATA_INCOMPLETE";
+        } else {
+            status.style.color = "#0f0";
+            status.innerText = "> ACCOUNT_CREATED. RETURN TO LOGIN.";
+            setTimeout(toggle, 2000);
+        }
+    }
+</script>
+
+</body>
+</html>
