@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Genesis AI | Portal</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
+        body { height: 100vh; display: flex; justify-content: center; align-items: center; background: #050505; color: #fff; }
+        .box { background: #111; padding: 40px; border-radius: 20px; width: 320px; border: 1px solid #222; text-align: center; }
+        h2 { color: #38bdf8; margin-bottom: 25px; letter-spacing: 2px; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 10px; border: 1px solid #333; background: #1a1a1a; color: #fff; outline: none; }
+        .btn { width: 100%; padding: 12px; background: #38bdf8; border: none; border-radius: 10px; color: #000; font-weight: bold; cursor: pointer; margin-top: 15px; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h2>GENESIS AI</h2>
+        <input type="text" id="u" placeholder="Login">
+        <input type="password" id="p" placeholder="Password">
+        <button class="btn" onclick="go()">ENTER</button>
+    </div>
+    <script>
+        function go() {
+            const u = document.getElementById('u').value;
+            const p = document.getElementById('p').value;
+            if(u !== "" && p !== "") {
+                // Bu kod "main.html" degan faylga o'tkazib yuboradi
+                window.location.href = "main.html";
+            } else {
+                alert("Please enter login and password!");
+            }
+        }
+    </script>
+</body>
+</html>
