@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alpha Terminal V5.0</title>
+    <style>
+        /* Professional Hacker Style */
+        :root {
+            --neon-green: #00FF41;
+            --dark-bg: #050505;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: var(--neon-green);
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .container {
+            width: 350px;
+            padding: 25px;
+            border: 2px solid var(--neon-green);
+            background: rgba(0, 20, 0, 0.95);
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.3);
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 2px solid var(--neon-green);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            background: transparent;
+            border: 1px solid var(--neon-green);
+            color: var(--neon-green);
+            outline: none;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: var(--neon-green);
+            color: #000;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 10px;
+            text-transform: uppercase;
+        }
+
+        button:hover {
+            background: #000;
+            color: var(--neon-green);
+            border: 1px solid var(--neon-green);
+        }
+
+        #status-log {
+            margin-top: 15px;
+            font-size: 0.8rem;
+            text-align: center;
+            min-height: 20px;
+        }
+
+        /* Dashboard hidden by default */
+        #dashboard {
+            display: none;
+        }
+
+        .stat-line {
+            margin: 10px 0;
+            font-size: 0.85rem;
+            border-left: 3px solid var(--neon-green);
+            padding-left: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div id="login-form">
+            <div class="header">> AUTH_REQUIRED</div>
+            <input type="text" id="username" placeholder="IDENTIFIER">
+            <input type="password" id="password" placeholder="ACCESS_KEY">
+            <button onclick="startAuth()">[ AUTHORIZE ]</button>
+            <div id="status-log"></div>
+        </div>
+
+        <div id="dashboard">
+            <div class="header">> SYSTEM_ACCESS_GRANTED</div>
+            <p>WELCOME BACK, <span id="user-display"></span></p>
+            <div class="stat-line">CORE_STATUS: STABLE</div>
+            <div class="stat-line">ENCRYPTION: ACTIVE</div>
+            <div class="stat-line">LOCATION: TAJIKISTAN</div>
+            <button onclick="logout()" style="background: transparent; color: red; border: 1px solid red; margin-top: 20px;">
+                [ DISCONNECT ]
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function startAuth() {
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
+            const log = document.getElementById('status-log');
+
+            if (user === "" || pass === "") {
+                log.innerText = "> ERROR: FIELDS_CANNOT_BE_EMPTY";
+                log.style.color = "red";
+            } else {
+                log.style.color = "#00FF41";
+                log.innerText = "> INITIALIZING_HANDSHAKE...";
+
+                // Bu yerda login jarayonini simulyatsiya qilamiz
+                setTimeout(() => {
+                    log.innerText = "> DECRYPTING_DATABASE...";
+                    
+                    setTimeout(() => {
+                        // Loginni yashirib, Dashboardni ko'rsatamiz
+                        document.getElementById('login-form').style.display = 'none';
+                        document.getElementById('dashboard').style.display = 'block';
+                        document.getElementById('user-display').innerText = user.toUpperCase();
+                    }, 1000);
+
+                }, 1000);
+            }
+        }
+
+        function logout() {
+            // Hammasini boshiga qaytarish
+            location.reload();
+        }
+    </script>
+</body>
+</html>
