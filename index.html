@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Genesis AI | Secure Login</title>
+    <style>
+        body { margin: 0; background: #000; color: #fff; font-family: 'Arial', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        .card { border: 1px solid #333; padding: 40px; border-radius: 20px; text-align: center; width: 320px; box-shadow: 0 0 20px rgba(56, 189, 248, 0.2); }
+        h2 { color: #38bdf8; margin-bottom: 20px; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 10px; border: 1px solid #222; background: #111; color: #fff; outline: none; }
+        button { width: 100%; padding: 12px; background: #38bdf8; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>GENESIS AI</h2>
+        <input type="text" id="u" placeholder="Username">
+        <input type="password" id="p" placeholder="Password">
+        <button onclick="login()">SIGN IN</button>
+    </div>
+
+    <script>
+        function login() {
+            const u = document.getElementById('u').value;
+            const p = document.getElementById('p').value;
+            
+            // Bu yerga o'zingiz xohlagan login va parolni qo'ying
+            if(u === "Behruz" && p === "2026") {
+                alert("Welcome back!");
+                // LOGIN TO'G'RI BO'LSA, SAYTNING ASOSIY QISMIGA O'TADI
+                window.location.href = "https://wealth-wise-sigma-seven.vercel.app/main.html"; 
+            } else {
+                alert("Access Denied! Check your credentials.");
+            }
+        }
+    </script>
+</body>
+</html>
