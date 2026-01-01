@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WealthWise - Professional Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-slate-50 font-sans pb-24 text-slate-800">
+
+    <header class="bg-indigo-700 p-6 text-white sticky top-0 shadow-lg z-50 rounded-b-3xl flex justify-between items-center">
+        <div>
+            <h1 class="text-2xl font-black italic tracking-tighter">WealthWise</h1>
+            <p class="text-[10px] opacity-70 uppercase tracking-widest">Global Finance Hub</p>
+        </div>
+        <div class="w-10 h-10 bg-indigo-500 rounded-full flex items-center justify-center border-2 border-white/20">
+            <i class="fas fa-user"></i>
+        </div>
+    </header>
+
+    <main class="p-5 space-y-6 max-w-md mx-auto">
+        <div class="bg-white p-8 rounded-[2.5rem] shadow-xl shadow-indigo-100 border border-slate-50 relative overflow-hidden">
+            <div class="relative z-10">
+                <p class="text-slate-400 text-sm font-semibold uppercase tracking-wider">Joriy Balans</p>
+                <h2 class="text-4xl font-black text-indigo-900 mt-1">$12,450.00</h2>
+                <div class="mt-4 inline-flex items-center px-3 py-1 bg-emerald-100 text-emerald-600 rounded-full text-xs font-bold">
+                    <i class="fas fa-arrow-up mr-1"></i> +5.2% bugun
+                </div>
+            </div>
+            <div class="absolute -right-6 -top-6 w-24 h-24 bg-indigo-50 rounded-full"></div>
+        </div>
+
+        <div class="bg-gradient-to-br from-indigo-600 to-blue-500 p-6 rounded-[2.5rem] text-white shadow-lg">
+            <div class="flex items-center gap-3 mb-3">
+                <i class="fas fa-robot text-2xl"></i>
+                <h3 class="font-bold text-lg">AI Maslahatchi</h3>
+            </div>
+            <p class="text-sm leading-relaxed opacity-90 italic">
+                "Sizning portfelingiz tahlil qilindi. Bugun texnologiya aksiyalariga sarmoya kiritish uchun qulay vaqt."
+            </p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex flex-col items-center gap-3 active:scale-95 transition-transform">
+                <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center">
+                    <i class="fas fa-chart-line text-xl"></i>
+                </div>
+                <span class="text-xs font-black uppercase text-slate-500">Investitsiya</span>
+            </div>
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex flex-col items-center gap-3 active:scale-95 transition-transform">
+                <div class="w-12 h-12 bg-orange-50 text-orange-500 rounded-2xl flex items-center justify-center">
+                    <i class="fas fa-university text-xl"></i>
+                </div>
+                <span class="text-xs font-black uppercase text-slate-500">Akademiya</span>
+            </div>
+        </div>
+    </main>
+
+    <nav class="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-lg border-t border-slate-100 p-5 flex justify-around text-slate-400">
+        <i class="fas fa-home text-indigo-600 text-xl"></i>
+        <i class="fas fa-wallet text-xl hover:text-indigo-500"></i>
+        <div class="bg-indigo-600 text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center -mt-10 border-4 border-slate-50">
+            <i class="fas fa-plus text-xl"></i>
+        </div>
+        <i class="fas fa-chart-pie text-xl hover:text-indigo-500"></i>
+        <i class="fas fa-cog text-xl hover:text-indigo-500"></i>
+    </nav>
+
+</body>
+</html>
