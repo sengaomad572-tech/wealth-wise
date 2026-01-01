@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alpha Terminal Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #02040a; color: #f8fafc; font-family: 'Inter', sans-serif; }
+        .glass-panel { background: #0f172a; border: 1px solid #1e293b; border-radius: 24px; }
+        #main_chart { height: 75vh !important; min-height: 500px; }
+    </style>
+</head>
+<body class="p-0 m-0">
+
+    <div class="w-full h-[40px] border-b border-slate-800 bg-[#02040a]">
+        <div class="tradingview-widget-container">
+            <div class="tradingview-widget-container__widget"></div>
+            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
+            {
+                "symbols": [
+                    {"proName": "BITSTAMP:BTCUSD", "title": "BTC/USD"},
+                    {"proName": "BITSTAMP:ETHUSD", "title": "ETH/USD"},
+                    {"proName": "NASDAQ:AAPL", "title": "APPLE"},
+                    {"proName": "NASDAQ:NVDA", "title": "NVIDIA"},
+                    {"proName": "NASDAQ:TSLA", "title": "TESLA"},
+                    {"proName": "FX_IDC:EURUSD", "title": "EUR/USD"}
+                ],
+                "showSymbolLogo": true, "colorTheme": "dark", "isTransparent": true, "displayMode": "adaptive", "locale": "en"
+            }
+            </script>
+        </div>
+    </div>
+
+    <div class="p-4 space-y-6 max-w-7xl mx-auto">
+        <div class="glass-panel p-2 flex items-center shadow-2xl focus-within:ring-2 focus-within:ring-blue-500/50 transition">
+            <input type="text" id="symbolSearch" placeholder="SEARCH ASSET TICKER (e.g. MSFT, BTCUSD, Gold)" 
+                   class="bg-transparent flex-1 p-3 outline-none font-bold uppercase text-blue-400 text-sm tracking-widest placeholder:text-slate-700">
+            <button onclick="executeTrade()" class="bg-blue-600 hover:bg-blue-500 px-8 py-3 rounded-xl font-black text-[10px] tracking-tighter transition active:scale-95 uppercase">
+                Execute
+            </button>
+        </div>
+
+        <div class="glass-panel overflow-hidden shadow-2xl">
+            <div id="main_chart"></div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="glass-panel p-6">
+                <h3 class="text-[10px] font-black text-slate-500 uppercase mb-6 tracking-[4px] text-center border-b border-slate-800 pb-2">Technical Summary</h3>
+                <div id="tech_analysis_container" class="h-[350px]">
+                    </div>
+            </div>
+
+            <div class="glass-panel p-6 h-[430px] overflow-hidden">
+                <h3 class="text-[10px] font-black text-slate-500 uppercase mb-6 tracking-[4px] text-center border-b border-slate-800 pb-2">Global Timeline</h3>
+                <div class="tradingview-widget-container">
+                    <div class="tradingview-widget-container__widget"></div>
+                    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-timeline.js" async>
+                    {
+                        "feedMode": "all_symbols", "colorTheme": "dark", "isTransparent": true, "displayMode": "regular",
+                        "width": "100%", "height": "350", "locale": "en"
+                    }
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+    <script>
+        function updateTerminal(symbol) {
+            // 1. Load Main Chart
+            new TradingView.widget({
+                "width": "100%", "height": "100%", "symbol": symbol, "interval": "D", "timezone": "Etc/UTC",
+                "theme": "dark", "style": "1", "locale": "en", "toolbar_bg": "#f1f3f6", "enable_publishing": false,
+                "withdateranges": true, "hide_side_toolbar": false, "allow_symbol_change": true, "container_id": "main_chart"
+            });
+
+            // 2. Load Technical Gauge
+            const container = document.getElementById('tech_analysis_container');
+            container.innerHTML = ''; 
+            const script = document.createElement('script');
+            script.type = 'text/javascript';
+            script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-technical-analysis.js';
+            script.async = true;
+            script.innerHTML = JSON.stringify({
+                "interval": "1D", "width": "100%", "isTransparent": true, "height": "100%",
+                "symbol": symbol, "showIntervalTabs": true, "locale": "en", "colorTheme": "dark"
+            });
+            container.appendChild(script);
+        }
+
+        function executeTrade() {
+            const val = document.getElementById('symbolSearch').value.toUpperCase().trim();
+            if(val) updateTerminal(val);
+        }
+
+        // Default Load
+        window.onload = () => updateTerminal('NVDA');
+    </script>
+</body>
+          </html>
+  
