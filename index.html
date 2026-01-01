@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<title>All-in-One Financial Analytics</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body{margin:0;font-family:Arial,sans-serif;background:#0b1120;color:#e5e7eb}
+header{padding:20px;background:#020617;border-bottom:1px solid #1e293b}
+header h1{color:#38bdf8;margin:0;font-size:26px}
+header p{margin:5px 0 0;color:#94a3b8}
+.container{max-width:1200px;margin:auto;padding:20px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
+.card{background:#020617;border:1px solid #1e293b;border-radius:12px;padding:20px}
+.card h3{color:#38bdf8;margin-top:0}
+.price{font-size:26px;font-weight:bold}
+.up{color:#4ade80}
+.down{color:#f87171}
+.danger{color:#f87171;font-weight:bold}
+.safe{color:#4ade80;font-weight:bold}
+.neutral{color:#facc15;font-weight:bold}
+.login-box{margin-top:30px;background:#020617;border:1px solid #1e293b;border-radius:12px;padding:20px}
+input{width:100%;padding:10px;margin:8px 0;border-radius:6px;border:1px solid #1e293b;background:#020617;color:#e5e7eb}
+.btn{display:inline-block;padding:10px 16px;background:#38bdf8;color:#020617;border-radius:8px;text-decoration:none;font-weight:bold;margin-top:10px}
+footer{text-align:center;padding:20px;border-top:1px solid #1e293b;color:#64748b;font-size:14px}
+</style>
+</head>
+<body>
+
+<header>
+<h1>📊 Investorlar uchun BARCHASI BIR JOYDA</h1>
+<p>Aksiya • ETF • Obligatsiya • Risk • AI tahlil</p>
+</header>
+
+<div class="container">
+<div class="grid" id="companies"></div>
+
+<div class="login-box">
+<h3>🔐 Login / Pullik obuna</h3>
+<input type="email" placeholder="Email">
+<input type="password" placeholder="Parol">
+<a class="btn" href="#">Kirish</a>
+<p style="font-size:13px;color:#94a3b8;margin-top:10px;">Stripe / Payme ulashga tayyor</p>
+</div>
+</div>
+
+<footer>
+© 2026 All-in-One Financial Analytics | Investorlar uchun platforma
+</footer>
+
+<script>
+// === DEMO: 10000+ kompaniya uchun API fetch usuli ===
+async function loadCompanies() {
+    const container = document.getElementById("companies");
+
+    // Demo JSON: haqiqiy loyihada bu o'rniga API ulaysiz
+    // 10000 ta kompaniya o'rniga hozir 20 ta demo
+    const companies = [];
+    for(let i=1;i<=20;i++){
+        companies.push({
+            name: "Kompaniya " + i,
+            symbol: "CMP"+i,
+            price: (Math.random()*500).toFixed(2),
+            profit: Math.floor(Math.random()*100),
+            debt: Math.floor(Math.random()*150),
+            risk: ["Past","O‘rtacha","Yuqori"][Math.floor(Math.random()*3)]
+        });
+    }
+
+    companies.forEach(c=>{
+        let aiStyle="neutral", aiText="Barqaror, ehtiyot chorasi zarur";
+        if(c.risk==="Yuqori" || c.debt > c.profit*2){ aiStyle="danger"; aiText="Xavfli, ehtiyot chorasi zarur"; }
+        else if(c.risk==="Past"){ aiStyle="safe"; aiText="O‘sishda, barqaror"; }
+
+        container.innerHTML += `
+        <div class="card">
+            <h3>${c.name} (${c.symbol})</h3>
+            <div class="price up">$${c.price}</div>
+            <p>💰 Foyda: ${c.profit} mlrd</p>
+            <p>🏦 Qarz: ${c.debt} mlrd</p>
+            <p>⚠️ Risk: ${c.risk}</p>
+            <p>🤖 AI: <span class="${aiStyle}">${aiText}</span></p>
+        </div>
+        `;
+    });
+}
+
+loadCompanies();
+</script>
+
+</body>
+</html>
