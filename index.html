@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WealthWise Pro - AI Moliya</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-indigo-50 font-sans pb-24 text-slate-800">
+
+    <header class="bg-indigo-700 p-6 text-white sticky top-0 shadow-lg z-50 rounded-b-[2.5rem] flex justify-between items-center">
+        <div>
+            <h1 class="text-2xl font-black italic tracking-tighter">WealthWise</h1>
+            <p class="text-[10px] opacity-70 uppercase tracking-widest">Smart Finance AI</p>
+        </div>
+        <div class="w-10 h-10 bg-indigo-500 rounded-full flex items-center justify-center border-2 border-white/20">
+            <i class="fas fa-robot text-sm"></i>
+        </div>
+    </header>
+
+    <main class="p-5 space-y-6 max-w-md mx-auto">
+        <div class="bg-white p-6 rounded-[2rem] shadow-xl shadow-indigo-200/50 border border-white">
+            <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-1">Mening Balansim</p>
+            <h2 class="text-4xl font-black text-indigo-900 leading-none">$12,450.00</h2>
+            <div class="mt-4 flex items-center gap-2">
+                <span class="bg-emerald-100 text-emerald-600 px-3 py-1 rounded-full text-[10px] font-black italic uppercase">AI Faol</span>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-[2rem] shadow-lg border border-slate-100">
+            <h3 class="font-black text-slate-700 mb-4 flex items-center gap-2 uppercase text-xs">
+                <i class="fas fa-calculator text-indigo-600"></i> Foyda Kalkulyatori
+            </h3>
+            <div class="space-y-3">
+                <input id="income" type="number" placeholder="Daromad ($)" class="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-indigo-500 outline-none font-bold">
+                <input id="expense" type="number" placeholder="Xarajat ($)" class="w-full p-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-rose-500 outline-none font-bold">
+                <button onclick="calculateWealth()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-black py-4 rounded-2xl shadow-lg transition-all active:scale-95">HISOBLASH</button>
+            </div>
+            
+            <div id="result-box" class="hidden mt-4 p-4 rounded-2xl text-center font-bold text-sm italic">
+                <p id="result-text"></p>
+            </div>
+        </div>
+
+        <div class="bg-gradient-to-br from-indigo-600 to-blue-600 p-6 rounded-[2.5rem] text-white shadow-xl">
+            <h3 class="font-bold text-lg mb-2"><i class="fas fa-lightbulb mr-2"></i> AI Tavsiyasi</h3>
+            <p id="ai-advice" class="text-xs leading-relaxed opacity-90 italic">
+                "Kalkulyatorga ma'lumot kiriting, men sizga eng yaxshi moliyaviy yo'lni ko'rsataman."
+            </p>
+        </div>
+    </main>
+
+    <nav class="fixed bottom-6 left-6 right-6 bg-white/90 backdrop-blur-md rounded-[2.5rem] p-4 flex justify-around text-slate-400 shadow-2xl border border-white">
+        <i class="fas fa-home text-indigo-600 text-xl"></i>
+        <i class="fas fa-chart-pie text-xl"></i>
+        <div class="bg-indigo-600 text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center -mt-10 border-4 border-indigo-50">
+            <i class="fas fa-plus text-xl"></i>
+        </div>
+        <i class="fas fa-wallet text-xl"></i>
+        <i class="fas fa-cog text-xl"></i>
+    </nav>
+
+    <script>
+        function calculateWealth() {
+            const income = document.getElementById('income').value;
+            const expense = document.getElementById('expense').value;
+            const resultBox = document.getElementById('result-box');
+            const resultText = document.getElementById('result-text');
+            const aiAdvice = document.getElementById('ai-advice');
+
+            if (income === '' || expense === '') {
+                alert('Iltimos, raqamlarni kiriting!');
+                return;
+            }
+
+            const profit = income - expense;
+            resultBox.classList.remove('hidden');
+            resultText.innerText = "Sof foyda: $" + profit;
+
+            if (profit > 0) {
+                aiAdvice.innerText = "Ajoyib! Sizda $" + profit + " foyda qoldi. Buning 15% qismini omonatga qo'yishni maslahat beraman.";
+                resultBox.className = "mt-4 p-4 rounded-2xl text-center font-bold bg-emerald-50 text-emerald-600";
+            } else {
+                aiAdvice.innerText = "Ehtiyot bo'ling! Xarajatlar ko'p. Kelasi hafta ko'ngilochar xarajatlarni kamaytiring.";
+                resultBox.className = "mt-4 p-4 rounded-2xl text-center font-bold bg-rose-50 text-rose-600";
+            }
+        }
+    </script>
+</body>
+</html>
