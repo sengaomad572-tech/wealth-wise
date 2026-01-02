@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WealthWise • Pro Investment Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0f172a;
+  --card:#1e293b;
+  --accent:#22c55e;
+  --text:#e5e7eb;
+  --muted:#94a3b8;
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif;}
+body{background:var(--bg);color:var(--text);}
+header{display:flex;align-items:center;padding:15px;background:#020617;}
+.menu-btn{font-size:26px;cursor:pointer;margin-right:15px;}
+.sidebar{
+  position:fixed;top:0;left:-280px;width:280px;height:100%;background:#020617;padding:20px;transition:0.3s;overflow:auto;
+}
+.sidebar.active{left:0}
+.sidebar h2{margin-bottom:20px;color:var(--accent);}
+.sidebar button{
+  width:100%;padding:12px;margin-bottom:10px;background:var(--card);border:none;color:var(--text);cursor:pointer;text-align:left;
+}
+.sidebar button:hover{background:#334155;}
+main{margin-left:0;padding:20px;transition:margin-left 0.3s;}
+main.active{margin-left:280px;}
+.card{background:var(--card);border-radius:12px;padding:20px;margin-bottom:20px;box-shadow:0 0 20px rgba(0,0,0,0.3);}
+input{width:100%;padding:10px;margin-bottom:10px;background:#0f172a;border:none;color:white;border-radius:6px;}
+button.action{padding:10px 15px;background:var(--accent);color:#020617;border:none;border-radius:6px;cursor:pointer;}
+.badge{padding:5px 12px;border-radius:20px;font-size:12px;}
+.green{background:#22c55e;color:#020617;}
+.red{background:#ef4444;}
+.yellow{background:#eab308;color:#422006;}
+.ticker{white-space:nowrap;overflow:hidden;}
+.ticker span{display:inline-block;padding-left:100%;animation:ticker 15s linear infinite;}
+@keyframes ticker{from{transform:translateX(0);}to{transform:translateX(-100%);}}
+canvas{width:100%;height:200px;background:#0f172a;border-radius:12px;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="menu-btn" onclick="UI.toggle()">☰</div>
+  <h3>WealthWise Dashboard</h3>
+</header>
+
+<aside class="sidebar" id="sidebar">
+  <h2>Menu</h2>
+  <button onclick="Router.go('portfolio')">📊 Portfolio Tracker</button>
+  <button onclick="Router.go('sentiment')">🤖 Market Sentiment AI</button>
+  <button onclick="Router.go('news')">📰 News Ticker</button>
+  <button onclick="Router.go('swap')">💱 Quick Swap Calculator</button>
+</aside>
+
+<main id="app"></main>
+
+<script>
+/* ========== STATE MANAGEMENT ========== */
+const Store={
+  state:{
+    portfolio:JSON.parse(localStorage.getItem('portfolio')||'[]'),
+    sentiment:null
+  },
+  save(){localStorage.setItem('portfolio',JSON.stringify(this.state.portfolio))}
+}
+
+/* ========== UI FUNCTIONS ========== */
+const UI={
+  toggle(){document.getElementById('sidebar').classList.toggle('active');document.querySelector('main').classList.toggle('active');},
+  render(html){document.getElementById('app').innerHTML=html;}
+}
+
+/* ========== ROUTER ========== */
+const Router={
+  go(view){UI.render('');Views[view]();UI.toggle();}
+}
+
+/* ========== AI SIMULATION ========== */
+const AI={
+  sentiment(){
+    let v=Math.floor(Math.random()*100);
+    let type=v<35?'fear':v<60?'neutral':'greed';
+    Store.state.sentiment={value:v,type};
+    return Store.state.sentiment;
+  }
+}
+
+/* ========== CHART DRAWING ========== */
+function drawChart(canvas,data){
+  const ctx=canvas.getContext('2d');
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  let max=Math.max(...data,10);
+  data.forEach((v,i)=>{
+    let h=(v/max)*150;
+    ctx.fillStyle=v>=0?'#22c55e':''#ef4444;
+    ctx.fillRect(i*40+10,180-h,25,h);
+  })
+}
+
+/* ========== VIEWS ========== */
+const Views={
+portfolio(){
+  let rows=Store.state.portfolio.map(p=>`<li>${p.name} | Invest: $${p.invest} → $${p.current} | Profit: $${p.current-p.invest}</li>`).join('');
+  UI.render(`
+  <div class="card">
+    <h3>Portfolio Tracker</h3>
+    <input id="name" placeholder="Asset name">
+    <input id="invest" placeholder="Invest ($)">
+    <input id="current" placeholder="Current ($)">
+    <button class="action" onclick="Actions.add()">Add Asset</button>
+    <ul>${rows}</ul>
+  </div>`)
+},
+sentiment(){
+  let s=AI.sentiment();
+  let badge=s.type==='fear'?'red':s.type==='greed'?'green':'yellow';
+  UI.render(`<div class="card">
+    <h3>Market Sentiment AI</h3>
+    <p>Index: <b>${s.value}</b></p>
+    <span class="badge ${badge}">${s.type.toUpperCase()}</span>
+  </div>`)
+},
+news(){
+  UI.render(`<div class="card">
+    <h3>News Ticker</h3>
+    <div class="ticker"><span>📈 S&P 500 o'smoqda | 💰 Oltin narxi ko'tarildi | 💱 Dollar kursi o'zgarishda | 🌍 Crypto yangiliklari | 🔥 Bozor trendi</span></div>
+  </div>`)
+},
+swap(){
+  UI.render(`<div class="card">
+    <h3>Quick Swap Calculator</h3>
+    <input id="usd" placeholder="USD">
+    <button class="action" onclick="Actions.fx()">Convert USD → EUR</button>
+    <p id="swapResult"></p>
+  </div>`)
+}
+}
+
+/* ========== ACTIONS ========== */
+const Actions={
+  add(){
+    let p={name:name.value,invest:+invest.value,current:+current.value};
+    Store.state.portfolio.push(p);
+    Store.save();
+    Views.portfolio();
+  },
+  fx(){
+    let usd=+document.getElementById('usd').value;
+    document.getElementById('swapResult').innerText='≈ €'+(usd*0.92).toFixed(2);
+  }
+}
+
+/* ========== INIT ========== */
+Views.portfolio();
+</script>
+</body>
+</html>
