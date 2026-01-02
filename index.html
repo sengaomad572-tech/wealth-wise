@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WealthWise | Startup Terminal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background-color: #05070a; color: #cbd5e1; overflow-x: hidden; }
+        .sidebar { transition: transform 0.3s ease-in-out; z-index: 100; }
+        .content-section { display: none; animation: fadeIn 0.4s ease; }
+        .content-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .menu-overlay { display: none; background: rgba(0,0,0,0.6); z-index: 90; }
+        .menu-overlay.active { display: block; }
+    </style>
+</head>
+<body>
+
+    <header class="p-4 bg-[#0a0c12] border-b border-white/5 flex items-center justify-between sticky top-0 z-50">
+        <div class="flex items-center gap-4">
+            <button onclick="toggleMenu()" class="text-white text-2xl p-2 focus:outline-none">
+                <i class="fas fa-bars"></i> </button>
+            <h1 class="text-lg font-black text-white italic tracking-tighter uppercase">Wealth<span class="text-indigo-500">Wise</span></h1>
+        </div>
+        <div class="text-[10px] font-bold text-emerald-500 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
+            ● LIVE
+        </div>
+    </header>
+
+    <div id="sidebar" class="sidebar fixed top-0 left-0 h-full w-64 bg-[#0a0c12] border-r border-white/10 p-6 transform -translate-x-full">
+        <div class="flex justify-between items-center mb-10">
+            <span class="font-black text-indigo-500">MENU</span>
+            <button onclick="toggleMenu()" class="text-white text-xl"><i class="fas fa-times"></i></button>
+        </div>
+        <nav class="space-y-6">
+            <a href="#" onclick="showSection('terminal')" class="flex items-center gap-4 text-white hover:text-indigo-400 font-bold transition">
+                <i class="fas fa-terminal w-6"></i> Terminal
+            </a>
+            <a href="#" onclick="showSection('portfolio')" class="flex items-center gap-4 text-white hover:text-indigo-400 font-bold transition">
+                <i class="fas fa-wallet w-6"></i> Portfolio Tracker
+            </a>
+            <a href="#" onclick="showSection('insights')" class="flex items-center gap-4 text-white hover:text-indigo-400 font-bold transition">
+                <i class="fas fa-brain w-6"></i> Market Sentiment
+            </a>
+            <a href="#" onclick="showSection('tools')" class="flex items-center gap-4 text-white hover:text-indigo-400 font-bold transition">
+                <i class="fas fa-calculator w-6"></i> Quick Swap
+            </a>
+        </nav>
+    </div>
+
+    <div id="overlay" onclick="toggleMenu()" class="menu-overlay fixed inset-0"></div>
+
+    <div class="bg-indigo-600/10 border-b border-indigo-500/20 py-2 overflow-hidden whitespace-nowrap">
+        <div class="inline-block animate-pulse text-[10px] font-bold text-indigo-400 uppercase tracking-widest px-4">
+            BREAKING: BTC hits $96,500 • NVIDIA AI chips demand surges • Gold markets stabilize • 
+        </div>
+    </div>
+
+    <main class="p-6 max-w-xl mx-auto">
+        
+        <section id="terminal" class="content-section active space-y-6">
+            <div class="bg-[#0a0c12] p-6 rounded-[2rem] border border-white/5">
+                <h3 class="text-xs font-bold text-slate-500 uppercase mb-4">Live Market Search</h3>
+                <div class="flex gap-2 bg-black/40 p-2 rounded-2xl border border-white/5">
+                    <input id="stInput" type="text" placeholder="AAPL..." class="flex-1 bg-transparent p-2 outline-none uppercase font-bold text-white">
+                    <button onclick="analyzeStock()" class="bg-indigo-600 px-6 py-2 rounded-xl font-black text-xs text-white">GO</button>
+                </div>
+                <div id="res" class="hidden mt-8">
+                    <h2 id="n" class="text-5xl font-black italic text-white">-</h2>
+                    <p id="p" class="text-3xl font-black text-emerald-400">$0.00</p>
+                    <div class="h-48 mt-4"><canvas id="mainChart"></canvas></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="portfolio" class="content-section space-y-6">
+            <h2 class="text-2xl font-black italic text-white">Portfolio Tracker</h2>
+            <div class="grid grid-cols-1 gap-4">
+                <div class="bg-[#0a0c12] p-6 rounded-3xl border border-white/5">
+                    <p class="text-[10px] text-slate-500 uppercase font-bold">Total P&L</p>
+                    <p class="text-3xl font-black text-emerald-400">+$1,420.50</p>
+                </div>
+                <div class="bg-[#0a0c12] p-4 rounded-2xl border border-white/5 flex justify-between items-center">
+                    <span class="font-bold">Bitcoin (BTC)</span>
+                    <span class="text-emerald-500 font-black">+$12,000</span>
+                </div>
+            </div>
+        </section>
+
+        <section id="insights" class="content-section space-y-6">
+            <div class="bg-[#0a0c12] p-10 rounded-[2.5rem] border border-white/5 text-center shadow-2xl">
+                <p class="text-[10px] font-bold text-slate-500 uppercase mb-6">Fear & Greed Index</p>
+                <div class="text-7xl font-black text-emerald-500">76</div>
+                <p class="text-xl font-black uppercase text-white mt-2">Extreme Greed</p>
+                <div class="w-full bg-slate-800 h-2 rounded-full mt-6 overflow-hidden">
+                    <div class="bg-indigo-500 h-full w-[76%]"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="tools" class="content-section space-y-6">
+            <div class="bg-[#0a0c12] p-8 rounded-[2rem] border border-white/5">
+                <h3 class="text-indigo-500 font-bold text-[10px] uppercase mb-6 text-center">Currency Swap</h3>
+                <input type="number" id="usd" oninput="swap()" placeholder="USD Amount" class="w-full bg-black/40 p-4 rounded-2xl border border-white/5 font-black text-xl outline-none text-white text-center">
+                <div class="text-center my-4 text-indigo-500 text-2xl">↓</div>
+                <div id="uzs" class="p-4 bg-indigo-600/10 rounded-2xl text-center font-black text-2xl text-indigo-400">0.00 UZS</div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        function toggleMenu() {
+            document.getElementById('sidebar').classList.toggle('-translate-x-full');
+            document.getElementById('overlay').classList.toggle('active');
+        }
+
+        function showSection(id) {
+            document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            toggleMenu(); // Menyu tanlangandan keyin yopiladi
+        }
+
+        function swap() {
+            const val = document.getElementById('usd').value;
+            document.getElementById('uzs').innerText = (val * 12850).toLocaleString() + " UZS";
+        }
+
+        let chart = null;
+        function analyzeStock() {
+            const s = document.getElementById('stInput').value.toUpperCase();
+            if(!s) return;
+            document.getElementById('res').classList.remove('hidden');
+            document.getElementById('n').innerText = s;
+            document.getElementById('p').innerText = '$' + (Math.random()*200+100).toFixed(2);
+            
+            if(chart) chart.destroy();
+            const ctx = document.getElementById('mainChart').getContext('2d');
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['1','2','3','4','5','6'],
+                    datasets: [{
+                        data: Array.from({length: 6}, () => Math.random() * 50 + 100),
+                        borderColor: '#6366f1', borderWidth: 3, tension: 0.4, pointRadius: 0
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+                    scales: { x: { display: false }, y: { display: false } }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
