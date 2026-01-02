@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WealthWise - Terminal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white font-sans min-h-screen">
+
+    <header class="p-6 bg-gray-800 border-b border-gray-700 text-center">
+        <h1 class="text-2xl font-bold text-indigo-400">WealthWise</h1>
+        <p class="text-[10px] text-gray-500 uppercase tracking-widest">Global Market Terminal</p>
+    </header>
+
+    <main class="p-5 max-w-md mx-auto space-y-6">
+        <div class="bg-gray-800 p-6 rounded-[2rem] border border-gray-700 shadow-xl text-center">
+            <h3 class="text-xs font-bold text-gray-400 mb-4 uppercase">Aksiya qidirish</h3>
+            <input id="stInput" type="text" placeholder="AAPL, TSLA yoki NVDA" class="w-full p-4 bg-gray-900 rounded-2xl border border-gray-600 outline-none mb-4 uppercase font-bold text-indigo-400">
+            <button onclick="checkStock()" class="w-full bg-indigo-600 py-4 rounded-2xl font-bold hover:bg-indigo-500 active:scale-95 transition-all">TAHLIL QILISH</button>
+        </div>
+
+        <div id="res" class="hidden bg-gray-800 p-6 rounded-[2rem] border border-gray-700 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-gray-700 pb-4 mb-4">
+                <h2 id="n" class="text-2xl font-black italic text-white">-</h2>
+                <p id="p" class="text-2xl font-black text-emerald-400">$0.00</p>
+            </div>
+            <div class="p-4 bg-indigo-900/30 rounded-xl border border-indigo-500/20">
+                <p class="text-[10px] text-indigo-400 font-bold uppercase mb-1 italic">AI Tahlili</p>
+                <p id="msg" class="text-xs italic text-gray-300 leading-relaxed"></p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function checkStock() {
+            const s = document.getElementById('stInput').value.toUpperCase();
+            const r = document.getElementById('res');
+            if(!s) return;
+
+            const data = {
+                'AAPL': {p: '192.53', m: 'Apple AI sohasida yangi hamkorliklarni yo\'lga qo\'ymoqda. Investorlar ishonchi yuqori.'},
+                'TSLA': {p: '174.12', m: 'Tesla ishlab chiqarish hajmini oshirmoqda, lekin bozorda raqobat kuchaygan.'},
+                'NVDA': {p: '885.00', m: 'Nvidia chiplariga bo\'lgan talab rekord darajada. Hozirgi eng kuchli aktivlardan biri.'}
+            };
+
+            const info = data[s] || {p: (Math.random()*200+50).toFixed(2), m: s + ' bo\'yicha bozor holati barqaror. Uzoq muddatli investitsiya uchun mos nuqta.'};
+
+            document.getElementById('n').innerText = s;
+            document.getElementById('p').innerText = '$' + info.p;
+            document.getElementById('msg').innerText = '"' + info.m + '"';
+            r.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
