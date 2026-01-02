@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WealthWise - Terminal Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-[#0b0f1a] text-white font-sans min-h-screen pb-10">
+
+    <header class="p-6 bg-[#161b2c] border-b border-gray-800 flex justify-between items-center shadow-lg">
+        <div>
+            <h1 class="text-2xl font-black text-indigo-500 italic tracking-tighter">WEALTHWISE</h1>
+            <p class="text-[9px] text-gray-500 uppercase tracking-[0.3em]">Institutional Grade Terminal</p>
+        </div>
+        <div class="px-4 py-2 bg-emerald-500/10 border border-emerald-500/30 rounded-full">
+            <span class="text-emerald-500 text-xs font-bold animate-pulse">● LIVE MARKET</span>
+        </div>
+    </header>
+
+    <main class="p-4 max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+        
+        <div class="bg-[#161b2c] p-6 rounded-[2rem] border border-gray-800 shadow-2xl">
+            <h3 class="text-xs font-bold text-gray-400 mb-4 uppercase italic">Market Explorer</h3>
+            <div class="flex gap-2">
+                <input id="stInput" type="text" placeholder="AAPL, TSLA, NVDA..." class="flex-1 p-4 bg-[#0b0f1a] rounded-2xl border border-gray-700 outline-none uppercase font-bold text-indigo-400 focus:border-indigo-500">
+                <button onclick="analyzeStock()" class="px-6 bg-indigo-600 rounded-2xl font-black hover:bg-indigo-500 transition-all italic text-sm">GO</button>
+            </div>
+
+            <div id="res" class="hidden mt-6 space-y-4">
+                <div class="flex justify-between items-end">
+                    <h2 id="n" class="text-4xl font-black italic">-</h2>
+                    <p id="p" class="text-3xl font-black text-emerald-400">$0.00</p>
+                </div>
+                <div class="h-[150px] w-full bg-black/20 rounded-xl p-2">
+                    <canvas id="miniChart"></canvas>
+                </div>
+                <p id="msg" class="text-sm text-gray-400 italic leading-relaxed bg-black/30 p-4 rounded-xl"></p>
+            </div>
+        </div>
+
+        <div class="bg-[#161b2c] p-6 rounded-[2rem] border border-gray-800 shadow-2xl">
+            <h3 class="text-xs font-bold text-gray-400 mb-4 uppercase italic">Live Forex</h3>
+            <div class="space-y-4">
+                <div class="flex justify-between items-center p-4 bg-[#0b0f1a] rounded-2xl border border-gray-800">
+                    <span class="font-bold">USD / UZS</span>
+                    <span class="font-black text-emerald-400">12,850.00</span>
+                </div>
+                <div class="flex justify-between items-center p-4 bg-[#0b0f1a] rounded-2xl border border-gray-800">
+                    <span class="font-bold">BTC / USD</span>
+                    <span class="font-black text-orange-400">$96,430.20</span>
+                </div>
+                <div class="flex justify-between items-center p-4 bg-[#0b0f1a] rounded-2xl border border-gray-800">
+                    <span class="font-bold">GOLD / OZ</span>
+                    <span class="font-black text-yellow-500">$2,654.10</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let myChart = null;
+        function analyzeStock() {
+            const s = document.getElementById('stInput').value.toUpperCase();
+            if(!s) return;
+            const r = document.getElementById('res');
+            r.classList.remove('hidden');
+            const price = (Math.random()*500+100).toFixed(2);
+            document.getElementById('n').innerText = s;
+            document.getElementById('p').innerText = '$' + price;
+            document.getElementById('msg').innerText = s + " tahlili shuni ko'rsatadiki, aktiv hozirda barqaror o'sish zonasida.";
+            if(myChart) myChart.destroy();
+            const ctx = document.getElementById('miniChart').getContext('2d');
+            myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['1h', '2h', '3h', '4h', '5h', '6h'],
+                    datasets: [{
+                        label: 'Price',
+                        data: Array.from({length: 6}, () => Math.floor(Math.random() * 100) + 200),
+                        borderColor: '#10b981',
+                        tension: 0.4,
+                        borderWidth: 3,
+                        pointRadius: 0
+                    }]
+                },
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { x: { display: false }, y: { display: false } }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
