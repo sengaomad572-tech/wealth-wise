@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InvestMind AI | Smart Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0b0f1a; color: #e2e8f0; }
+        .glass-card { background: rgba(17, 24, 39, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 24px; }
+        .ai-gradient { background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); }
+    </style>
+</head>
+<body class="p-4 lg:p-10">
+
+    <nav class="flex justify-between items-center mb-10">
+        <div>
+            <h1 class="text-2xl font-bold ai-gradient bg-clip-text text-transparent">InvestMind AI</h1>
+            <p class="text-xs text-gray-500">Xush kelibsiz, Investor!</p>
+        </div>
+        <button onclick="openAddAssetModal()" class="ai-gradient text-white px-5 py-2.5 rounded-xl font-semibold shadow-lg shadow-blue-500/20 hover:scale-105 transition">
+            <i class="fa-solid fa-plus mr-2"></i>Aktiv Qo'shish
+        </button>
+    </nav>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <div class="lg:col-span-2 glass-card p-8">
+            <div class="flex justify-between items-start mb-6">
+                <div>
+                    <h3 class="text-gray-400 text-sm font-medium">Umumiy Balans</h3>
+                    <div class="flex items-center gap-3">
+                        <h2 id="total-balance-display" class="text-4xl font-bold">$0.00</h2>
+                        <span class="text-green-400 text-sm font-bold bg-green-400/10 px-2 py-1 rounded-lg">+0.0%</span>
+                    </div>
+                </div>
+            </div>
+            <canvas id="portfolioPerformanceChart" height="120"></canvas>
+        </div>
+
+        <div class="glass-card p-8 flex flex-col items-center justify-center text-center">
+            <h3 class="text-gray-400 text-sm mb-6">AI Salomatlik Reytingi</h3>
+            <div class="relative w-40 h-40 flex items-center justify-center rounded-full border-4 border-blue-500/20">
+                <div id="ai-health-score" class="text-5xl font-black text-blue-400">100</div>
+            </div>
+            <p id="ai-analysis-status" class="mt-6 text-sm text-gray-300 italic px-4 text-center">
+                Aktivlaringiz tahlil qilinmoqda...
+            </p>
+        </div>
+
+        <div class="lg:col-span-2 glass-card p-8">
+            <h3 class="text-lg font-bold mb-6 text-gray-200">Sizning Aktivlaringiz</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="text-gray-500 border-b border-gray-800">
+                            <th class="pb-4 text-left">Aktiv Nomi</th>
+                            <th class="pb-4 text-left">Qiymat ($)</th>
+                            <th class="pb-4 text-right">Amal</th>
+                        </tr>
+                    </thead>
+                    <tbody id="assets-table-body">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="glass-card p-8">
+            <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-robot text-blue-400"></i> AI Maslahatchi
+            </h3>
+            <div id="ai-insights-container" class="space-y-4">
+                </div>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * GLOBAL STATE
+         */
+        let userAssets = [];
+
+        /**
+         * CORE FUNCTIONS
+         */
+        function openAddAssetModal() {
+            const assetName = prompt("Aktiv nomini kiriting (e.g. BTC, Apple):");
+            const assetValue = parseFloat(prompt("Miqdorini ($) kiriting:"));
+
+            if (assetName && !isNaN(assetValue)) {
+                const newAsset = {
+                    id: Date.now(),
+                    name: assetName,
+                    value: assetValue
+                };
+                userAssets.push(newAsset);
+                renderDashboard();
+            }
+        }
+
+        function removeAsset(id) {
+            userAssets = userAssets.filter(asset => asset.id !== id);
+            renderDashboard();
+        }
+
+        function calculateTotalBalance() {
+            return userAssets.reduce((total, asset) => total + asset.value, 0);
+        }
+
+        /**
+         * AI LOGIC ENGINE
+         */
+        function runAIAnalysis() {
+            const healthScoreElement = document.getElementById('ai-health-score');
+            const statusElement = document.getElementById('ai-analysis-status');
+            const insightsContainer = document.getElementById('ai-insights-container');
+            
+            let score = 100;
+            let insightHTML = "";
+
+            if (userAssets.length === 0) {
+                statusElement.innerText = "Tahlil qilish uchun ma'lumot yetarli emas.";
+                insightHTML = `<div class="p-4 bg-gray-500/10 rounded-xl text-xs text-gray-400 italic">Hozircha tavsiyalar yo'q.</div>`;
+            } else if (userAssets.length < 3) {
+                score = 45;
+                statusElement.innerText = "Xavf aniqlandi!";
+                insightHTML = `<div class="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-sm text-red-200">
+                    ⚠️ <b>Xatarli diversifikatsiya:</b> Aktivlaringiz soni juda kam. Portfolioingizni kengaytiring.
+                </div>`;
+            } else {
+                score = 92;
+                statusElement.innerText = "Portfolio holati juda yaxshi!";
+                insightHTML = `<div class="p-4 bg-green-500/10 border border-green-500/20 rounded-xl text-sm text-green-200">
+                    ✅ <b>AI Xulosasi:</b> Diversifikatsiya darajasi ajoyib. Kutilayotgan o'sish barqaror.
+                </div>`;
+            }
+
+            healthScoreElement.innerText = score;
+            insightsContainer.innerHTML = insightHTML;
+        }
+
+        /**
+         * UI RENDERING
+         */
+        function renderDashboard() {
+            const tableBody = document.getElementById('assets-table-body');
+            const totalDisplay = document.getElementById('total-balance-display');
+            
+            tableBody.innerHTML = "";
+            let total = calculateTotalBalance();
+
+            userAssets.forEach((asset) => {
+                tableBody.innerHTML += `
+                    <tr class="border-b border-gray-800/50 hover:bg-white/5 transition">
+                        <td class="py-4 font-semibold">${asset.name}</td>
+                        <td class="py-4">$${asset.value.toLocaleString()}</td>
+                        <td class="py-4 text-right">
+                            <button onclick="removeAsset(${asset.id})" class="text-gray-500 hover:text-red-400 transition">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            totalDisplay.innerText = "$" + total.toLocaleString();
+            runAIAnalysis();
+        }
+
+        // Initialize Chart
+        const chartContext = document.getElementById('portfolioPerformanceChart').getContext('2d');
+        new Chart(chartContext, {
+            type: 'line',
+            data: {
+                labels: ['Du', 'Se', 'Ch', 'Pa', 'Ju', 'Sh', 'Ya'],
+                datasets: [{
+                    label: 'Performance',
+                    data: [5000, 7500, 6000, 9000, 8500, 11000, 10500],
+                    borderColor: '#3b82f6',
+                    borderWidth: 3,
+                    tension: 0.4,
+                    fill: true,
+                    backgroundColor: 'rgba(59, 130, 246, 0.05)'
+                }]
+            },
+            options: { 
+                plugins: { legend: { display: false } },
+                scales: { y: { display: false }, x: { grid: { display: false } } }
+            }
+        });
+    </script>
+</body>
+</html>
