@@ -1,0 +1,62 @@
+/**
+ * APPLICATION STATE & STORAGE
+ */
+// Sahifa yuklanganda LocalStorage'dan ma'lumotlarni olish
+let portfolioAssets = JSON.parse(localStorage.getItem('investMindData')) || [];
+
+/**
+ * FETCH REAL PRICES (Binance API misolida)
+ */
+async function getLivePrice(symbol) {
+    try {
+        // Kripto aktivlar uchun (masalan BTC, ETH)
+        const response = await fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${symbol.toUpperCase()}USDT`);
+        const data = await response.json();
+        return parseFloat(data.price);
+    } catch (error) {
+        console.error("Narxni olishda xatolik:", error);
+        return null;
+    }
+}
+
+/**
+ * CORE LOGIC
+ */
+async function handleAddNewAsset() {
+    const assetName = prompt("Aktiv belgisini kiriting (masalan: BTC, ETH):").toUpperCase();
+    
+    // AI Loading holati
+    document.getElementById('analysis-status-text').innerText = "Narxlar tekshirilmoqda...";
+    
+    const livePrice = await getLivePrice(assetName);
+    
+    if (livePrice) {
+        const newEntry = {
+            id: Date.now(),
+            name: assetName,
+            value: livePrice, // Haqiqiy bozor narxi ulandi!
+            timestamp: new Date().toLocaleString()
+        };
+        portfolioAssets.push(newEntry);
+        saveAndRefresh();
+    } else {
+        alert("Aktiv topilmadi yoki API ulanishda xatolik. Iltimos, faqat kripto belgilarini kiriting (masalan: BTC).");
+        document.getElementById('analysis-status-text').innerText = "Xatolik yuz berdi.";
+    }
+}
+
+function saveAndRefresh() {
+    // LocalStorage'ga yozish
+    localStorage.setItem('investMindData', JSON.stringify(portfolioAssets));
+    updateDashboardUI();
+}
+
+function removeAssetEntry(assetId) {
+    portfolioAssets = portfolioAssets.filter(item => item.id !== assetId);
+    saveAndRefresh();
+}
+
+// Sahifa yuklanganda UI'ni chizish
+document.addEventListener('DOMContentLoaded', () => {
+    updateDashboardUI();
+});
