@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InvestMind AI | Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: white; }
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <header class="flex justify-between items-center mb-10">
+        <div>
+            <h1 class="text-2xl font-bold text-blue-400">InvestMind AI</h1>
+            <p class="text-gray-400 text-sm">Aqlli investitsiya paneli</p>
+        </div>
+        <div class="flex gap-4">
+            <button onclick="addAsset()" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg transition">
+                <i class="fa-solid fa-plus mr-2"></i>Aktiv Qo'shish
+            </button>
+        </div>
+    </header>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <div class="md:col-span-2 glass p-6 rounded-2xl">
+            <h3 class="text-gray-400 mb-4">Umumiy Portfel Balansi</h3>
+            <div class="flex items-end gap-4 mb-6">
+                <h2 id="total-balance" class="text-4xl font-bold">$0.00</h2>
+                <span class="text-green-400 font-semibold mb-1"><i class="fa-solid fa-caret-up"></i> 12.5%</span>
+            </div>
+            <canvas id="portfolioChart" height="150"></canvas>
+        </div>
+
+        <div class="glass p-6 rounded-2xl">
+            <h3 class="text-gray-400 mb-2 text-center">AI Salomatlik Darajasi</h3>
+            <div class="relative flex justify-center items-center py-6">
+                <div id="health-score" class="text-6xl font-bold text-blue-400">100</div>
+                <div class="absolute text-xs text-gray-500 mt-16">/ 100</div>
+            </div>
+            <p id="ai-status" class="text-center text-sm text-gray-300 mt-4 italic">"Hali aktivlar qo'shilmagan"</p>
+        </div>
+
+        <div class="glass p-6 rounded-2xl">
+            <h3 class="text-lg font-semibold mb-4 text-blue-300"><i class="fa-solid fa-robot mr-2"></i> AI Tahlili</h3>
+            <ul id="ai-tips" class="space-y-4 text-sm">
+                <li class="border-l-4 border-blue-500 pl-3 py-1 text-gray-400">
+                    Aktiv qo'shing va AI tahlilini kuting...
+                </li>
+            </ul>
+        </div>
+
+        <div class="md:col-span-2 glass p-6 rounded-2xl overflow-x-auto">
+            <h3 class="text-lg font-semibold mb-4 text-gray-200">Sizning Aktivlaringiz</h3>
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="text-gray-500 border-b border-gray-700 text-sm">
+                        <th class="pb-3 px-2">Nomi</th>
+                        <th class="pb-3">Qiymati ($)</th>
+                        <th class="pb-3 text-right">Amal</th>
+                    </tr>
+                </thead>
+                <tbody id="asset-list" class="text-sm">
+                    </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <script>
+        let assets = [];
+
+        // Aktiv qo'shish funksiyasi
+        function addAsset() {
+            const name = prompt("Aktiv nomini kiriting (masalan: Apple yoki BTC):");
+            const price = parseFloat(prompt("Miqdorini ($) kiriting:"));
+
+            if (name && !isNaN(price)) {
+                assets.push({ name, price });
+                updateUI();
+            }
+        }
+
+        // Interfeysni yangilash
+        function updateUI() {
+            const list = document.getElementById('asset-list');
+            const totalDisplay = document.getElementById('total-balance');
+            const aiTips = document.getElementById('ai-tips');
+            const healthScore = document.getElementById('health-score');
+            
+            list.innerHTML = "";
+            let total = 0;
+
+            assets.forEach((asset, index) => {
+                total += asset.price;
+                list.innerHTML += `
+                    <tr class="border-b border-gray-800">
+                        <td class="py-4 px-2 font-medium">${asset.name}</td>
+                        <td>$${asset.price.toLocaleString()}</td>
+                        <td class="text-right">
+                            <button onclick="removeAsset(${index})" class="text-red-500 hover:text-red-400 px-2">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            totalDisplay.innerText = "$" + total.toLocaleString();
+            
+            // AI Logikasi: Diversifikatsiya tahlili
+            if (assets.length > 0) {
+                let score = 100;
+                let tips = "";
+                
+                // Agar faqat 1 ta aktiv bo'lsa risk yuqori
+                if (assets.length === 1) {
+                    score = 40;
+                    tips = `<li class="border-l-4 border-yellow-500 pl-3 py-1 text-yellow-200 font-semibold">
+                                Xavf: Portfelingizda diversifikatsiya yo'q! Kamida 3 xil aktiv qo'shing.
+                            </li>`;
+                } else if (assets.length >= 3) {
+                    score = 95;
+                    tips = `<li class="border-l-4 border-green-500 pl-3 py-1 text-green-200">
+                                Zo'r: Portfel yaxshi diversifikatsiya qilingan.
+                            </li>`;
+                }
+                
+                healthScore.innerText = score;
+                aiTips.innerHTML = tips;
+                document.getElementById('ai-status').innerText = "AI tahlilni yakunladi.";
+            }
+        }
+
+        function removeAsset(index) {
+            assets.splice(index, 1);
+            updateUI();
+        }
+
+        // Grafik (Statik)
+        const ctx = document.getElementById('portfolioChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Dush', 'Sesh', 'Chor', 'Pay', 'Jum', 'Shan', 'Yak'],
+                datasets: [{
+                    label: 'O\'sish dinamikasi',
+                    data: [12000, 15000, 14000, 19000, 22000, 25000, 28000],
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                plugins: { legend: { display: false } },
+                scales: { 
+                    y: { display: false },
+                    x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
