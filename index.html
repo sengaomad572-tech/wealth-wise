@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InvestMind AI | Universal Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0b0f1a; color: #f8fafc; overflow-x: hidden; }
+        .glass-panel { background: rgba(17, 24, 39, 0.7); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 20px; }
+        .accent-gradient { background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); }
+        
+        /* Chatbot uslubi */
+        #ai-chatbot { position: fixed; bottom: 20px; right: 20px; width: 300px; height: 400px; display: none; flex-direction: column; z-index: 50; }
+        .chat-open { display: flex !important; }
+    </style>
+</head>
+<body class="p-4 md:p-10">
+
+    <nav class="flex justify-between items-center mb-10 max-w-7xl mx-auto">
+        <h1 class="text-2xl font-bold accent-gradient bg-clip-text text-transparent">InvestMind AI</h1>
+        <button onclick="addNewAsset()" class="accent-gradient text-white px-5 py-2.5 rounded-xl font-semibold shadow-lg hover:scale-105 transition">
+            <i class="fa-solid fa-plus mr-2"></i>Aktiv Qo'shish
+        </button>
+    </nav>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+        
+        <div class="lg:col-span-2 glass-panel p-8">
+            <h3 class="text-gray-400 text-sm font-semibold uppercase mb-2">Umumiy Portfel Qiymati</h3>
+            <h2 id="total-balance" class="text-5xl font-extrabold mb-6">$0.00</h2>
+            <canvas id="mainChart" height="120"></canvas>
+        </div>
+
+        <div class="glass-panel p-8 flex flex-col items-center">
+            <h3 class="text-gray-400 text-sm font-semibold uppercase mb-6">Aktivlar Ulushi</h3>
+            <div style="width: 220px; height: 220px;">
+                <canvas id="allocationChart"></canvas>
+            </div>
+        </div>
+
+        <div class="lg:col-span-2 glass-panel p-8">
+            <h3 class="text-lg font-bold mb-6">Mening Aktivlarim</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm">
+                    <thead>
+                        <tr class="text-gray-500 border-b border-gray-800">
+                            <th class="pb-4">Nomi</th>
+                            <th class="pb-4">Qiymat ($)</th>
+                            <th class="pb-4 text-right">Amal</th>
+                        </tr>
+                    </thead>
+                    <tbody id="asset-table-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="glass-panel p-8">
+            <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-brain text-blue-400"></i> AI Ekspertiza
+            </h3>
+            <div id="ai-status" class="text-sm space-y-4 text-gray-400 italic">
+                Tahlil qilish uchun aktiv qo'shing...
+            </div>
+        </div>
+    </div>
+
+    <button onclick="toggleChat()" class="fixed bottom-6 right-6 w-14 h-14 accent-gradient rounded-full shadow-2xl flex items-center justify-center text-white text-2xl hover:scale-110 transition z-50">
+        <i class="fa-solid fa-comment-dots"></i>
+    </button>
+
+    <div id="ai-chatbot" class="glass-panel shadow-2xl p-4 overflow-hidden border border-blue-500/30">
+        <div class="flex justify-between items-center mb-4 border-b border-white/10 pb-2">
+            <span class="font-bold text-blue-400"><i class="fa-solid fa-robot mr-2"></i>AI Maslahatchi</span>
+            <button onclick="toggleChat()" class="text-gray-500 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div id="chat-content" class="flex-grow overflow-y-auto text-xs space-y-3 mb-4 pr-2">
+            <div class="bg-blue-500/10 p-2 rounded-lg text-blue-100">Salom! Men sizning shaxsiy AI investitsiya yordamchingizman. Portfelingiz haqida nimalarni bilishni xohlaysiz?</div>
+        </div>
+        <div class="flex gap-2">
+            <input id="chat-input" type="text" placeholder="Savol yozing..." class="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-blue-500">
+            <button onclick="askAI()" class="accent-gradient px-3 py-2 rounded-lg text-xs font-bold">Yuborish</button>
+        </div>
+    </div>
+
+    <script>
+        let myAssets = JSON.parse(localStorage.getItem('myInvestments')) || [];
+        let pieChart = null;
+
+        function addNewAsset() {
+            const name = prompt("Aktiv nomini kiriting (masalan: Oltin, Tesla, BTC):");
+            const value = parseFloat(prompt("Hozirgi umumiy qiymatini ($) kiriting:"));
+            
+            if (name && !isNaN(value)) {
+                myAssets.push({ id: Date.now(), name, value });
+                updateApp();
+            }
+        }
+
+        function removeAsset(id) {
+            myAssets = myAssets.filter(a => a.id !== id);
+            updateApp();
+        }
+
+        function updateApp() {
+            localStorage.setItem('myInvestments', JSON.stringify(myAssets));
+            renderUI();
+        }
+
+        function renderUI() {
+            const tbody = document.getElementById('asset-table-body');
+            const balanceLabel = document.getElementById('total-balance');
+            const aiStatus = document.getElementById('ai-status');
+            
+            tbody.innerHTML = "";
+            let total = 0;
+
+            myAssets.forEach(a => {
+                total += a.value;
+                tbody.innerHTML += `
+                    <tr class="border-b border-gray-800 hover:bg-white/5 transition">
+                        <td class="py-4 font-bold text-gray-200">${a.name}</td>
+                        <td class="py-4 font-medium">$${a.value.toLocaleString()}</td>
+                        <td class="py-4 text-right">
+                            <button onclick="removeAsset(${a.id})" class="text-gray-500 hover:text-red-400"><i class="fa-solid fa-trash-can"></i></button>
+                        </td>
+                    </tr>`;
+            });
+
+            balanceLabel.innerText = "$" + total.toLocaleString();
+
+            // AI Logic
+            if (myAssets.length === 0) {
+                aiStatus.innerHTML = "Hali ma'lumot yo'q.";
+            } else if (myAssets.length < 3) {
+                aiStatus.innerHTML = `<div class="p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-xl text-yellow-200 text-xs">⚠️ <b>Risk:</b> Diversifikatsiya past. Barcha pulingizni bir necha aktivga tikish xavfli bo'lishi mumkin.</div>`;
+            } else {
+                aiStatus.innerHTML = `<div class="p-3 bg-green-500/10 border border-green-500/20 rounded-xl text-green-200 text-xs">✅ <b>Barqaror:</b> Portfelingiz yaxshi taqsimlangan. AI tahlili bo'yicha risk darajasi past.</div>`;
+            }
+
+            renderPieChart();
+        }
+
+        function renderPieChart() {
+            const ctx = document.getElementById('allocationChart').getContext('2d');
+            if (pieChart) pieChart.destroy();
+            
+            pieChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: myAssets.map(a => a.name),
+                    datasets: [{
+                        data: myAssets.map(a => a.value),
+                        backgroundColor: ['#3b82f6', '#8b5cf6', '#ec4899', '#10b981', '#f59e0b', '#6366f1'],
+                        borderWidth: 0
+                    }]
+                },
+                options: { plugins: { legend: { display: false } }, cutout: '75%' }
+            });
+        }
+
+        // Chatbot funksiyalari
+        function toggleChat() {
+            document.getElementById('ai-chatbot').classList.toggle('chat-open');
+        }
+
+        function askAI() {
+            const input = document.getElementById('chat-input');
+            const content = document.getElementById('chat-content');
+            if (!input.value) return;
+
+            content.innerHTML += `<div class="bg-white/5 p-2 rounded-lg text-right text-gray-300 ml-8">${input.value}</div>`;
+            
+            // AI simulated response
+            setTimeout(() => {
+                let response = "Hozirgi portfelingizni tahlil qildim. Diversifikatsiyani oshirish uchun aktivlar sonini kamida 5 taga yetkazishingizni maslahat beraman.";
+                if (myAssets.length > 4) response = "Sizning portfelingiz ideal holatda! Bozor yangiliklarini kuzatib boring.";
+                
+                content.innerHTML += `<div class="bg-blue-500/10 p-2 rounded-lg text-blue-100 mr-8">🤖 ${response}</div>`;
+                content.scrollTop = content.scrollHeight;
+            }, 600);
+            
+            input.value = "";
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderUI();
+            const mainCtx = document.getElementById('mainChart').getContext('2d');
+            new Chart(mainCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Du', 'Se', 'Ch', 'Pa', 'Ju', 'Sh', 'Ya'],
+                    datasets: [{
+                        data: [15, 22, 19, 35, 30, 42, 45],
+                        borderColor: '#3b82f6',
+                        borderWidth: 3,
+                        tension: 0.4,
+                        fill: true,
+                        backgroundColor: 'rgba(59, 130, 246, 0.05)'
+                    }]
+                },
+                options: { plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false } } } }
+            });
+        });
+    </script>
+</body>
+</html>
