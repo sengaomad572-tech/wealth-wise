@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InvestMind AI | Smart Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0b0f1a; color: #f8fafc; }
+        .glass-panel { background: rgba(17, 24, 39, 0.7); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 20px; }
+        .accent-gradient { background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); }
+    </style>
+</head>
+<body class="p-4 md:p-10">
+
+    <nav class="flex justify-between items-center mb-10">
+        <div>
+            <h1 class="text-2xl font-bold accent-gradient bg-clip-text text-transparent">InvestMind AI</h1>
+            <p class="text-xs text-gray-500 font-medium">Aqlli tahlil platformasi</p>
+        </div>
+        <button onclick="handleAddNewAsset()" class="accent-gradient text-white px-5 py-2.5 rounded-xl font-semibold shadow-lg shadow-blue-500/20 hover:scale-105 transition duration-300">
+            <i class="fa-solid fa-plus mr-2"></i>Aktiv Qo'shish
+        </button>
+    </nav>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <div class="lg:col-span-2 glass-panel p-8">
+            <div class="flex justify-between items-start mb-6">
+                <div>
+                    <h3 class="text-gray-400 text-sm font-semibold uppercase tracking-wider">Umumiy Balans</h3>
+                    <div class="flex items-center gap-3">
+                        <h2 id="total-balance-label" class="text-4xl font-bold">$0.00</h2>
+                        <span class="text-green-400 text-sm font-bold bg-green-400/10 px-2 py-1 rounded-lg">+0.0%</span>
+                    </div>
+                </div>
+            </div>
+            <canvas id="mainPortfolioChart" height="120"></canvas>
+        </div>
+
+        <div class="glass-panel p-8 flex flex-col items-center justify-center text-center">
+            <h3 class="text-gray-400 text-sm font-semibold mb-6 uppercase">AI Salomatlik Reytingi</h3>
+            <div class="relative w-44 h-44 flex items-center justify-center rounded-full border-4 border-blue-500/10">
+                <div id="health-score-value" class="text-6xl font-black text-blue-400">100</div>
+                <div class="absolute inset-0 border-b-4 border-blue-500 rounded-full animate-pulse"></div>
+            </div>
+            <p id="analysis-status-text" class="mt-6 text-sm text-gray-400 italic">"Tahlil uchun ma'lumot kiritilmagan"</p>
+        </div>
+
+        <div class="lg:col-span-2 glass-panel p-8">
+            <h3 class="text-lg font-bold mb-6 text-gray-200">Sizning Aktivlaringiz</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left">
+                    <thead>
+                        <tr class="text-gray-500 border-b border-gray-800">
+                            <th class="pb-4 font-semibold uppercase text-xs">Aktiv Nomi</th>
+                            <th class="pb-4 font-semibold uppercase text-xs">Qiymat ($)</th>
+                            <th class="pb-4 text-right font-semibold uppercase text-xs">Amal</th>
+                        </tr>
+                    </thead>
+                    <tbody id="assets-list-container">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="glass-panel p-8">
+            <h3 class="text-lg font-bold mb-6 flex items-center gap-2">
+                <i class="fa-solid fa-robot text-blue-400"></i> AI Maslahatchi
+            </h3>
+            <div id="ai-insights-box" class="space-y-4">
+                <div class="p-4 bg-gray-800/40 rounded-xl text-xs text-gray-400 border border-white/5 italic">
+                    Hozircha tavsiyalar yo'q. Aktiv qo'shganingizdan so'ng tahlil boshlanadi.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * APPLICATION STATE
+         */
+        let portfolioAssets = [];
+
+        /**
+         * CORE LOGIC
+         */
+        function handleAddNewAsset() {
+            const assetName = prompt("Aktiv nomini kiriting (masalan: BTC, AAPL, Tesla):");
+            const assetAmount = parseFloat(prompt("Investitsiya miqdorini ($) kiriting:"));
+
+            if (assetName && !isNaN(assetAmount)) {
+                const newEntry = {
+                    id: Date.now(),
+                    name: assetName,
+                    value: assetAmount
+                };
+                portfolioAssets.push(newEntry);
+                updateDashboardUI();
+            }
+        }
+
+        function removeAssetEntry(assetId) {
+            portfolioAssets = portfolioAssets.filter(item => item.id !== assetId);
+            updateDashboardUI();
+        }
+
+        /**
+         * AI ENGINE: Portfolio Risk & Health Analysis
+         */
+        function runAIAnalysis() {
+            const scoreLabel = document.getElementById('health-score-value');
+            const statusLabel = document.getElementById('analysis-status-text');
+            const insightsBox = document.getElementById('ai-insights-box');
+            
+            let finalScore = 100;
+            let insightMarkup = "";
+
+            if (portfolioAssets.length === 0) {
+                statusLabel.innerText = "Ma'lumotlar kutilmoqda...";
+                insightMarkup = `<div class="p-4 bg-blue-500/5 rounded-xl text-xs text-gray-500">Portfolioingizni shakllantiring.</div>`;
+            } else if (portfolioAssets.length < 3) {
+                finalScore = 48;
+                scoreLabel.classList.replace('text-blue-400', 'text-yellow-500');
+                statusLabel.innerText = "Xavf: Diversifikatsiya yetarli emas!";
+                insightMarkup = `<div class="p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-xl text-sm text-yellow-200">
+                    ⚠️ <b>AI Ogohlantirishi:</b> Barcha kapitalni oz sonli aktivlarga tikish xavfli. Kamida 5 xil aktivga bo'lishni maslahat beraman.
+                </div>`;
+            } else {
+                finalScore = 94;
+                scoreLabel.classList.replace('text-yellow-500', 'text-blue-400');
+                statusLabel.innerText = "Portfolio holati barqaror.";
+                insightMarkup = `<div class="p-4 bg-green-500/10 border border-green-500/20 rounded-xl text-sm text-green-200 font-medium">
+                    ✅ <b>AI Xulosasi:</b> Diversifikatsiya darajasi juda yaxshi. Risklar to'g'ri boshqarilmoqda.
+                </div>`;
+            }
+
+            scoreLabel.innerText = finalScore;
+            insightsBox.innerHTML = insightMarkup;
+        }
+
+        /**
+         * UI RENDERER
+         */
+        function updateDashboardUI() {
+            const tableBody = document.getElementById('assets-list-container');
+            const totalLabel = document.getElementById('total-balance-label');
+            
+            tableBody.innerHTML = "";
+            let currentTotal = 0;
+
+            portfolioAssets.forEach((asset) => {
+                currentTotal += asset.value;
+                tableBody.innerHTML += `
+                    <tr class="border-b border-gray-800/50 hover:bg-white/5 transition duration-150">
+                        <td class="py-4 font-bold text-gray-100">${asset.name}</td>
+                        <td class="py-4 text-gray-300 font-medium">$${asset.value.toLocaleString()}</td>
+                        <td class="py-4 text-right">
+                            <button onclick="removeAssetEntry(${asset.id})" class="text-gray-500 hover:text-red-500 transition">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            totalLabel.innerText = "$" + currentTotal.toLocaleString();
+            runAIAnalysis();
+        }
+
+        /**
+         * INITIALIZATION: CHART.JS
+         */
+        const ctx = document.getElementById('mainPortfolioChart').getContext('2d');
+        const mainChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Du', 'Se', 'Ch', 'Pa', 'Ju', 'Sh', 'Ya'],
+                datasets: [{
+                    label: 'Trend',
+                    data: [1200, 1900, 3200, 2800, 4500, 5100, 6000],
+                    borderColor: '#3b82f6',
+                    borderWidth: 3,
+                    tension: 0.4,
+                    fill: true,
+                    backgroundColor: 'rgba(59, 130, 246, 0.05)'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: { 
+                    y: { display: false }, 
+                    x: { grid: { display: false }, ticks: { color: '#64748b' } } 
+                }
+            }
+        });
+    </script>
+</body>
+</html>
