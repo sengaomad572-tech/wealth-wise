@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InvestMind AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0b0f1a; color: #f8fafc; }
+        .glass-panel { background: rgba(17, 24, 39, 0.7); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 20px; }
+        .accent-gradient { background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); }
+    </style>
+</head>
+<body class="p-4 md:p-10">
+    <nav class="flex justify-between items-center mb-10 max-w-7xl mx-auto">
+        <h1 class="text-2xl font-bold accent-gradient bg-clip-text text-transparent">InvestMind AI</h1>
+        <button onclick="addAsset()" class="accent-gradient text-white px-5 py-2.5 rounded-xl font-semibold shadow-lg hover:scale-105 transition">
+            <i class="fa-solid fa-plus mr-2"></i>Aktiv Qo'shish
+        </button>
+    </nav>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+        <div class="lg:col-span-2 glass-panel p-8">
+            <h3 class="text-gray-400 text-sm font-semibold uppercase mb-2 text-center">Umumiy Balans</h3>
+            <h2 id="total-val" class="text-4xl font-bold mb-6 text-center">$0.00</h2>
+            <canvas id="lineChart" height="120"></canvas>
+        </div>
+
+        <div class="glass-panel p-8 flex flex-col items-center justify-center text-center">
+            <h3 class="text-gray-400 text-sm font-semibold uppercase mb-6">AI Score</h3>
+            <div class="relative w-40 h-40 flex items-center justify-center rounded-full border-4 border-blue-500/10">
+                <div id="score" class="text-5xl font-black text-blue-400">100</div>
+            </div>
+            <p id="ai-text" class="mt-6 text-xs text-gray-500 italic">"Ma'lumotlar tahlil qilinmoqda..."</p>
+        </div>
+
+        <div class="lg:col-span-2 glass-panel p-8">
+            <h3 class="text-lg font-bold mb-6">Aktivlarim</h3>
+            <table class="w-full text-left text-sm">
+                <thead><tr class="text-gray-500 border-b border-gray-800"><th class="pb-4">Nom</th><th class="pb-4">Qiymat</th><th class="pb-4 text-right">Amal</th></tr></thead>
+                <tbody id="asset-list"></tbody>
+            </table>
+        </div>
+
+        <div class="glass-panel p-8 flex flex-col items-center">
+            <h3 class="text-gray-400 text-sm font-semibold uppercase mb-6">Taqsimot</h3>
+            <canvas id="pieChart" width="180" height="180"></canvas>
+        </div>
+    </div>
+
+    <script>
+        let db = JSON.parse(localStorage.getItem('invest_v2')) || [];
+        let pChart = null;
+
+        function addAsset() {
+            const n = prompt("Aktiv nomi:");
+            const v = parseFloat(prompt("Qiymati ($):"));
+            if (n && !isNaN(v)) { db.push({ id: Date.now(), n, v }); update(); }
+        }
+
+        function delAsset(id) { db = db.filter(a => a.id !== id); update(); }
+
+        function update() {
+            localStorage.setItem('invest_v2', JSON.stringify(db));
+            draw();
+        }
+
+        function draw() {
+            const list = document.getElementById('asset-list');
+            const total = document.getElementById('total-val');
+            let sum = 0;
+            list.innerHTML = "";
+            db.forEach(a => {
+                sum += a.v;
+                list.innerHTML += `<tr class="border-b border-gray-800"><td class="py-4 font-bold">${a.n}</td><td class="py-4 font-medium">$${a.v.toLocaleString()}</td><td class="py-4 text-right"><button onclick="delAsset(${a.id})" class="text-gray-500 hover:text-red-500"><i class="fa-solid fa-trash"></i></button></td></tr>`;
+            });
+            total.innerText = "$" + sum.toLocaleString();
+            drawPie();
+        }
+
+        function drawPie() {
+            const ctx = document.getElementById('pieChart').getContext('2d');
+            if (pChart) pChart.destroy();
+            pChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: db.map(a => a.n),
+                    datasets: [{ data: db.map(a => a.v), backgroundColor: ['#3b82f6', '#8b5cf6', '#ec4899', '#10b981', '#f59e0b'], borderWidth: 0 }]
+                },
+                options: { plugins: { legend: { display: false } }, cutout: '75%' }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            draw();
+            const ctx = document.getElementById('lineChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['D','S','Ch','P','J','Sh','Y'],
+                    datasets: [{ data: [12, 19, 15, 25, 22, 30, 35], borderColor: '#3b82f6', tension: 0.4, fill: true, backgroundColor: 'rgba(59, 130, 246, 0.05)' }]
+                },
+                options: { plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false } } } }
+            });
+        });
+    </script>
+</body>
+</html>
